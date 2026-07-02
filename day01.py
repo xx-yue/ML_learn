@@ -1,6 +1,7 @@
 from sklearn.datasets import load_iris;
 from sklearn.model_selection import train_test_split;
 from sklearn.feature_extraction import DictVectorizer;
+from sklearn.feature_extraction.text import CountVectorizer;
 
 """
 sklearn数据集使用
@@ -37,7 +38,21 @@ def dict_demo():
     print('特征名字\n',transfer.get_feature_names())
     return None
 
+"""
+文本特征抽取
+:return:
+"""
+def count_demo():
+    data=['life is short,i like python','life is is too long,i love python']
+    #1.实例化一个转换器类
+    transfer=CountVectorizer()
+    #2.调用fit_transform
+    data_new=transfer.fit_transform(data)
+    print('文本特征抽取\n',data_new.toarray())
+    print('特征名字\n',transfer.get_feature_names())
+    return None
 
 if __name__ == '__main__':
     # datasets_demo()
-    dict_demo()
+    # dict_demo()
+    count_demo()
