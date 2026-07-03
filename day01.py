@@ -2,7 +2,7 @@ from sklearn.datasets import load_iris;
 from sklearn.model_selection import train_test_split;
 from sklearn.feature_extraction import DictVectorizer;
 from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer;
-from sklearn.preprocessing import MinMaxScaler;
+from sklearn.preprocessing import MinMaxScaler,StandardScaler;
 import jieba;
 import pandas as pd;
 
@@ -114,10 +114,27 @@ def min_max_demo():
     return None
 
 
+"""
+标准化
+:return:
+"""
+def stand_demo():
+    data = pd.read_csv('./data/dating.txt')
+    data = data.iloc[:,:3]
+    # 实例化一个转换器类
+    transfer = StandardScaler()
+    # 调用fit_transform
+    data_new = transfer.fit_transform(data)
+
+    print('最小最大值归一化\n',data_new)
+    return None
+
+
 if __name__ == '__main__':
     # datasets_demo()
     # dict_demo()
     # count_demo()
     # count_chinese_demo()
-    # tf_idf_demo()d
-    min_max_demo()
+    # tf_idf_demo()
+    # min_max_demo()
+    stand_demo()
