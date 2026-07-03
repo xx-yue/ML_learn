@@ -2,7 +2,9 @@ from sklearn.datasets import load_iris;
 from sklearn.model_selection import train_test_split;
 from sklearn.feature_extraction import DictVectorizer;
 from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer;
+from sklearn.preprocessing import MinMaxScaler;
 import jieba;
+import pandas as pd;
 
 """
 sklearn数据集使用
@@ -96,6 +98,20 @@ def tf_idf_demo():
     print('特征名字\n',transfer.get_feature_names())
     return None
 
+"""
+归一化
+:return:
+"""
+def min_max_demo():
+    data = pd.read_csv('./data/dating.txt')
+    data = data.iloc[:,:3]
+    # 实例化一个转换器类
+    transfer = MinMaxScaler(feature_range=[2,3])
+    # 调用fit_transform
+    data_new = transfer.fit_transform(data)
+
+    print('最小最大值归一化\n',data_new)
+    return None
 
 
 if __name__ == '__main__':
@@ -103,4 +119,5 @@ if __name__ == '__main__':
     # dict_demo()
     # count_demo()
     # count_chinese_demo()
-    tf_idf_demo()
+    # tf_idf_demo()d
+    min_max_demo()
