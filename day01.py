@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler,StandardScaler;
 import jieba;
 import pandas as pd;
 from scipy.stats import pearsonr;
-
+from sklearn.decomposition import PCA;
 
 """
 sklearn数据集使用
@@ -149,6 +149,18 @@ def variance_demo():
     print("相关系数：\n",r)
     return None
 
+"""
+PCA降维
+:return:
+"""
+def pca_demo():
+    data = [[2,8,4,5],[6,3,0,8],[5,4,9,1]]
+    # 实例化一个转换器类
+    transfer = PCA(n_components=2)
+    # 调用fit_transform
+    data_new = transfer.fit_transform(data)
+    print('PCA降维\n',data_new)
+    return None
 
 
 
@@ -165,4 +177,6 @@ if __name__ == '__main__':
     #标准化
     # stand_demo()
     # 过滤低方差
-    variance_demo()
+    # variance_demo()
+    # PCA降维
+    pca_demo()
