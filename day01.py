@@ -1,10 +1,13 @@
 from sklearn.datasets import load_iris;
+from sklearn.feature_selection import VarianceThreshold
 from sklearn.model_selection import train_test_split;
 from sklearn.feature_extraction import DictVectorizer;
 from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer;
 from sklearn.preprocessing import MinMaxScaler,StandardScaler;
 import jieba;
 import pandas as pd;
+from scipy.stats import pearsonr;
+
 
 """
 sklearn数据集使用
@@ -129,12 +132,37 @@ def stand_demo():
     print('最小最大值归一化\n',data_new)
     return None
 
+"""
+过滤低方差
+:return:
+"""
+def variance_demo():
+    data = pd.read_csv('./data/factor_returns.csv')
+    data = data.iloc[:,1:-2]
+    #   实例化一个转换器类
+    transfer = VarianceThreshold(threshold=5)
+    # 调用fit_transform
+    data_new = transfer.fit_transform(data)
+    print('过滤低方差\n',data_new)
+
+    r =pearsonr(data["pe_ratio"],data["pb_ratio"])
+    print("相关系数：\n",r)
+    return None
+
+
+
 
 if __name__ == '__main__':
     # datasets_demo()
     # dict_demo()
+    # 中文文本特征抽取
     # count_demo()
     # count_chinese_demo()
+    # 使用TF-idf进行文本特征抽取
     # tf_idf_demo()
+    # 归一化
     # min_max_demo()
-    stand_demo()
+    #标准化
+    # stand_demo()
+    # 过滤低方差
+    variance_demo()
