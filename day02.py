@@ -4,6 +4,10 @@ from  sklearn.preprocessing import StandardScaler;
 from sklearn.neighbors import KNeighborsClassifier;
 from sklearn.metrics import classification_report;
 from sklearn.model_selection import GridSearchCV
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
 
 """
 Knn 近邻算法 对鸢尾花进行分类
@@ -78,9 +82,41 @@ def knn_iris_gscv():
 
     return None
 
+"""
+用朴素贝叶斯算法对新闻进行分类
+:return:
+"""
+def nb_news():
+    # 1）获取数据
+    news = fetch_20newsgroups(subset="all")
+
+    # 2）划分数据集
+    x_train, x_test, y_train, y_test = train_test_split(news.data, news.target)
+
+    # 3）特征工程：文本特征抽取-tfidf
+    transfer = TfidfVectorizer()
+    x_train = transfer.fit_transform(x_train)
+    x_test = transfer.transform(x_test)
+
+    # 4）朴素贝叶斯算法预估器流程
+    estimator = MultinomialNB()
+    estimator.fit(x_train, y_train)
+
+    # 5）模型评估
+    # 方法1：直接比对真实值和预测值
+    y_predict = estimator.predict(x_test)
+    print("y_predict:\n", y_predict)
+    print("直接比对真实值和预测值:\n", y_test == y_predict)
+
+    # 方法2：计算准确率
+    score = estimator.score(x_test, y_test)
+    print("准确率为：\n", score)
+    return None
 
 if __name__ == '__main__':
     # KNN 对鸢尾花进行分类
     # knn_iris()
     #
-    knn_iris_gscv()
+    # knn_iris_gscv()
+    # 用朴素贝叶斯算法对新闻进行分类
+    nb_news()
