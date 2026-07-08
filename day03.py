@@ -37,11 +37,13 @@ def linear1():
     print("正规方程-均方误差为：\n", error)
 
     return None
+
+"""
+梯度下降的优化方法对波士顿房价进行预测
+:return:
+"""
 def linear2():
-    """
-    梯度下降的优化方法对波士顿房价进行预测
-    :return:
-    """
+
     # 1）获取数据
     boston = load_boston()
     print("特征数量：\n", boston.data.shape)
@@ -71,11 +73,12 @@ def linear2():
     return None
 
 
+"""
+岭回归对波士顿房价进行预测
+:return:
+"""
 def linear3():
-    """
-    岭回归对波士顿房价进行预测
-    :return:
-    """
+
     # 1）获取数据
     boston = load_boston()
     print("特征数量：\n", boston.data.shape)
