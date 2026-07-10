@@ -6,6 +6,25 @@ from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.decomposition import PCA
 
+"""训练 SVM 分类器并打印分类报告。
+
+Parameters
+----------
+X_train, X_test : DataFrame
+    训练/测试特征
+y_train, y_test : array-like
+    训练/测试标签
+class_names : array-like
+    原始类别名称
+**kwargs : dict
+    传递给 SVC 的参数（如 kernel、C、gamma 等）
+
+Returns
+-------
+model : SVC
+    训练好的模型
+y_pred : ndarray
+    测试集预测结果"""
 def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     model = SVC(**kwargs)
     model.fit(X_train, y_train)
@@ -17,6 +36,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     print(classification_report(y_test, y_pred, target_names=class_names))
     return model, y_pred
 
+"""绘制混淆矩阵热力图，展示真实类别 vs 预测类别的分布。"""
 def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
@@ -25,6 +45,7 @@ def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     plt.tight_layout()
     plt.show()
 
+"""PCA 降维到 2D，在降维后空间训练 SVM 并绘制决策边界。"""
 def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -50,6 +71,7 @@ def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     plt.tight_layout()
     plt.show()
 
+"""SVM 完整流水线：训练 → 评估 → 混淆矩阵 → PCA 决策边界。供 main.py 调用的统一入口。"""
 def run_svm_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le, **kwargs):
     model, y_pred = train_and_evaluate(X_train, X_test, y_train, y_test, le.classes_, **kwargs)
     accuracy = model.score(X_test, y_test)

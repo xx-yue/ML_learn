@@ -8,17 +8,16 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.decomposition import PCA
 
+"""
+训练决策树并打印评估结果。
 
+Returns
+-------
+model : DecisionTreeClassifier
+y_pred : ndarray
+"""
 def train_and_evaluate(X_train, X_test, y_train, y_test, class_names,
                        criterion='gini', max_depth=None, random_state=42):
-    """
-    训练决策树并打印评估结果。
-
-    Returns
-    -------
-    model : DecisionTreeClassifier
-    y_pred : ndarray
-    """
     model = DecisionTreeClassifier(
         criterion=criterion, max_depth=max_depth, random_state=random_state
     )
@@ -33,9 +32,8 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names,
 
     return model, y_pred
 
-
+"""绘制决策树结构图 — 决策树独有的可视化"""
 def plot_tree_structure(model, feature_names, class_names):
-    """绘制决策树结构图 — 决策树独有的可视化"""
     plt.figure(figsize=(16, 10))
     plot_tree(
         model,
@@ -52,9 +50,8 @@ def plot_tree_structure(model, feature_names, class_names):
     plt.tight_layout()
     plt.show()
 
-
+"""混淆矩阵热力图"""
 def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
-    """混淆矩阵热力图"""
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
     disp.plot(cmap='Blues', values_format='d')
@@ -63,10 +60,13 @@ def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     plt.show()
 
 
+
+
+"""
+PCA 降维到 2D，绘制决策树决策边界。
+"""
 def plot_pca_decision_boundary(X, y, model, class_names):
-    """
-    PCA 降维到 2D，绘制决策树决策边界。
-    """
+
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
 
@@ -106,8 +106,10 @@ def plot_pca_decision_boundary(X, y, model, class_names):
     plt.show()
 
 
+
+"""特征重要性柱状图 — 决策树独有的分析"""
 def plot_feature_importance(model, feature_names):
-    """特征重要性柱状图 — 决策树独有的分析"""
+
     importances = model.feature_importances_
     indices = np.argsort(importances)[::-1]
 
@@ -126,8 +128,9 @@ def plot_feature_importance(model, feature_names):
     plt.show()
 
 
+"""测试集特征对散点图矩阵 + 错误样本打印"""
 def plot_pairplot(X_test, y_test, y_pred, le):
-    """测试集特征对散点图矩阵 + 错误样本打印"""
+
     df_viz = X_test.copy()
     df_viz['真实类别'] = le.inverse_transform(y_test)
     df_viz['预测类别'] = le.inverse_transform(y_pred)
@@ -153,18 +156,19 @@ def plot_pairplot(X_test, y_test, y_pred, le):
         print('\n所有样本预测正确！')
 
 
+"""
+决策树完整流水线：训练 → 评估 → 四种可视化。
+
+Parameters
+----------
+criterion : 'gini' | 'entropy'
+    分裂准则：基尼系数 / 信息增益
+max_depth : int | None
+    最大深度，None 表示不限制（可能过拟合）
+"""
 def run_dt_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le,
                     criterion='gini', max_depth=None):
-    """
-    决策树完整流水线：训练 → 评估 → 四种可视化。
 
-    Parameters
-    ----------
-    criterion : 'gini' | 'entropy'
-        分裂准则：基尼系数 / 信息增益
-    max_depth : int | None
-        最大深度，None 表示不限制（可能过拟合）
-    """
     feature_names = X_train.columns.tolist()
 
     # 1. 训练 + 评估

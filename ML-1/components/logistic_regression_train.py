@@ -7,6 +7,19 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 from sklearn.decomposition import PCA
 
 
+"""训练逻辑回归分类器并打印分类报告。
+
+Parameters
+----------
+**kwargs : dict
+    传递给 LogisticRegression 的参数（如 max_iter、C、multi_class 等）
+
+Returns
+-------
+model : LogisticRegression
+    训练好的模型
+y_pred : ndarray
+    测试集预测结果"""
 def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     model = LogisticRegression(**kwargs)
     model.fit(X_train, y_train)
@@ -19,6 +32,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     return model, y_pred
 
 
+"""绘制混淆矩阵热力图，展示真实类别 vs 预测类别的分布。"""
 def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
@@ -28,6 +42,7 @@ def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     plt.show()
 
 
+"""PCA 降维到 2D，在降维后空间训练逻辑回归并绘制决策边界。"""
 def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -54,6 +69,10 @@ def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     plt.show()
 
 
+"""逻辑回归完整流水线：训练 → 评估 → 混淆矩阵 → PCA 决策边界。
+
+默认使用 multinomial 多分类 + max_iter=200。
+供 main.py 调用的统一入口。"""
 def run_lr_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le, **kwargs):
     # 默认参数：max_iter=200，多分类使用 multinomial
     if 'max_iter' not in kwargs:

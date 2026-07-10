@@ -7,6 +7,19 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 from sklearn.decomposition import PCA
 
 
+"""训练 XGBoost 分类器并打印分类报告。
+
+Parameters
+----------
+**kwargs : dict
+    传递给 XGBClassifier 的参数（如 n_estimators、max_depth、tree_method 等）
+
+Returns
+-------
+model : XGBClassifier
+    训练好的模型
+y_pred : ndarray
+    测试集预测结果"""
 def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     model = XGBClassifier(**kwargs)
     model.fit(X_train, y_train)
@@ -19,6 +32,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     return model, y_pred
 
 
+"""绘制混淆矩阵热力图，展示真实类别 vs 预测类别的分布。"""
 def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
@@ -28,6 +42,7 @@ def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     plt.show()
 
 
+"""绘制特征重要性柱状图。XGBoost 基于梯度提升过程中特征被用于分裂的次数和增益综合计算贡献度。"""
 def plot_feature_importance(model, feature_names):
     # XGBoost 自带特征重要性图，这里用条形图保持风格一致
     importances = model.feature_importances_
@@ -46,6 +61,7 @@ def plot_feature_importance(model, feature_names):
     plt.show()
 
 
+"""PCA 降维到 2D，在降维后空间训练 XGBoost 并绘制决策边界。"""
 def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -72,6 +88,10 @@ def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     plt.show()
 
 
+"""XGBoost 完整流水线：训练 → 评估 → 混淆矩阵 → 特征重要性 → PCA 决策边界。
+
+默认强制 CPU 模式（tree_method='hist'），评估指标使用 mlogloss。
+供 main.py 调用的统一入口。"""
 def run_xgb_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le, **kwargs):
     # 强制使用 CPU 模式，因为你的环境不支持 GPU
     if 'tree_method' not in kwargs:

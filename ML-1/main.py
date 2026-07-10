@@ -8,9 +8,6 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
-from components.knn_train import run_knn_pipeline
-from components.decision_tree import run_dt_pipeline
-
 # ==================== 数据加载 ====================
 columns = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class']
 
@@ -36,9 +33,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ==================== 1. KNN 训练与可视化 ====================
+# from components.knn_train import run_knn_pipeline
 # run_knn_pipeline(X_train, X_test, y_train, y_test, X, y_encoded, le, n_neighbors=3)
 
 # ==================== 2. 决策树训练与可视化 ====================
+# from components.decision_tree import run_dt_pipeline
 # run_dt_pipeline(X_train, X_test, y_train, y_test, X, y_encoded, le,
 #                 criterion='gini', max_depth=3)
 
