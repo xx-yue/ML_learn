@@ -1,5 +1,6 @@
 """鸢尾花分类 — 主入口"""
 import os
+os.environ['OMP_NUM_THREADS'] = '1'  # 修复 Windows MKL KMeans 内存泄漏
 import pandas as pd
 import matplotlib
 matplotlib.use('TkAgg')             # 修复 PyCharm 后端 bug
@@ -66,4 +67,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 # from components.lightgbm_train import run_lgb_pipeline
 # run_lgb_pipeline(X_train, X_test, y_train, y_test, X, y_encoded, le, boosting_type='gbdt', n_estimators=100)
 
+# ==================== 9. GBDT ====================
+# from components.gbdt_train import run_gbdt_pipeline
+# run_gbdt_pipeline(X_train, X_test, y_train, y_test, X, y_encoded, le, n_estimators=100)
 
+# ==================== 10. AdaBoost ====================
+from components.adaboost_train import run_adaboost_pipeline
+# run_adaboost_pipeline(X_train, X_test, y_train, y_test, X, y_encoded, le, n_estimators=50)
+
+# ==================== 11. K-means ====================
+from components.kmeans_train import run_kmeans_pipeline
+# Iris 去标签跑：X 是全部特征，y_encoded 是原标签（用于算 ARI）
+# run_kmeans_pipeline(X.values, y_encoded, n_clusters=3)
+
+
+# ==================== 12. 密度峰值聚类 ====================
+# from components.dpc_train import run_dpc_pipeline
+# # DPC 在 Iris 上：dc_percent 调 1.5-3.0 看效果，n_clusters=3
+# centers, y_pred_dpc = run_dpc_pipeline(X.values, y_encoded, n_clusters=3, dc_percent=0.5)
