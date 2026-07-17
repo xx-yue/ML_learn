@@ -1,0 +1,287 @@
+"""朴素贝叶斯分类器 — Glass 数据集（9 维特征）训练、评估与可视化"""
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.decomposition import PCA
+
+
+"""
+训练朴素贝叶斯并打印分类报告。
+
+Parameters
+----------
+X_train, X_test : DataFrame
+    训练/测试特征（已标准化）。
+y_train, y_test : array-like
+    训练/测试标签（已编码为 0-5）。
+class_names : array-like
+    原始类别名称。
+**kwargs : dict
+    传递给 GaussianNB 的参数（通常无特殊参数）。
+
+Returns
+-------
+model : GaussianNB
+    训练好的模型。
+y_pred : ndarray
+    测试集预测结果。
+"""
+def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
+    model = GaussianNB(**kwargs)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+
+    # 确保类别名称为字符串
+    class_names = [str(c) for c in class_names]
+
+    print(f'\n{"="*60}')
+    print('  朴素贝叶斯分类报告')
+    print(f'{"="*60}')
+    print(classification_report(y_test, y_pred, target_names=class_names))
+
+    return model, y_pred
+
+
+"""
+绘制混淆矩阵热力图。
+
+Parameters
+----------
+y_test : array-like
+    真实标签。
+y_pred : array-like
+    预测标签。
+class_names : array-like
+    类别名称。
+accuracy : float
+    准确率（用于标题显示）。
+"""
+def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    disp.plot(cmap='Purples', values_format='d')
+    plt.title(f'混淆矩阵 — 朴素贝叶斯\n准确率: {accuracy:.2%}')
+    plt.tight_layout()
+    plt.show()
+
+
+"""
+朴素贝叶斯没有直接的特征重要性属性，故本函数仅打印提示信息。
+
+Parameters
+----------
+model : GaussianNB
+    已训练的模型。
+feature_names : list
+    特征名称列表。
+"""
+def plot_feature_importance(model, feature_names):
+    # 朴素贝叶斯基于条件概率，无法直接给出特征重要性
+    # 但可以展示每个特征在每个类别下的均值（θ）和方差（σ²）
+    print('\n朴素贝叶斯特征统计（每个类别下的特征均值 θ 和方差 σ²）：')
+    for i in range(model.theta_.shape[0]):
+        print(f'\n类别 {i}:')
+        for j, name in enumerate(feature_names):
+            print(f'  {name}: θ={model.theta_[i,j]:.4f}, σ²={model.var_[i,j]:.4f}')
+
+
+"""
+PCA 降维到 2D，绘制朴素贝叶斯决策边界。
+
+Parameters
+----------
+X : DataFrame
+    全部特征（已标准化）。
+y : array-like
+    全部标签。
+class_names : array-like
+    类别名称。
+**kwargs : dict
+    传递给 GaussianNB 的参数。
+"""
+def plot_pca_decision_boundary(X, y, class_names, **kwargs):
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_pca, y, test_size=0.2, random_state=42, stratify=y
+    )
+    model = GaussianNB(**kwargs)
+    model.fit(X_train, y_train)
+
+    x_min, x_max = X_pca[:, 0].min() - 1, X_pca[:, 0].max() + 1
+    y_min, y_max = X_pca[:, 1].min() - 1, X_pca[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1),
+                         np.arange(y_min, y_max, 0.1))
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+
+    plt.figure(figsize=(10, 6))
+    plt.contourf(xx, yy, Z, alpha=0.3, cmap='Set1')
+    scatter = plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y,
+                          cmap='Set1', edgecolors='k', s=60)
+    plt.xlabel(f'主成分1 (解释方差: {pca.explained_variance_ratio_[0]:.1%})')
+    plt.ylabel(f'主成分2 (解释方差: {pca.explained_variance_ratio_[1]:.1%})')
+    plt.title(f'PCA 降维 + 朴素贝叶斯决策边界\n'
+              f'累计解释方差: {pca.explained_variance_ratio_.sum():.1%}  |  '
+              f'准确率: {model.score(X_test, y_test):.2%}')
+    plt.colorbar(scatter, ticks=[0, 1, 2, 3, 4, 5], label='类别')
+    plt.tight_layout()
+    plt.show()
+
+
+"""
+绘制特征相关性热力图，并打印各类别特征均值。
+
+Parameters
+----------
+X : DataFrame
+    全部特征（已标准化）。
+y_encoded : array-like
+    全部标签。
+class_names : array-like
+    类别名称。
+"""
+def plot_correlation_heatmap(X, y_encoded, class_names):
+    df_corr = X.copy()
+    df_corr['类别'] = y_encoded
+
+    print(f'\n{"="*60}')
+    print('  各类别特征均值对比')
+    print(f'{"="*60}')
+    for i, name in enumerate(class_names):
+        print(f'\n--- {name} ---')
+        print(df_corr[df_corr['类别'] == i].drop('类别', axis=1).mean().to_string())
+
+    plt.figure(figsize=(12, 10))
+    corr = X.corr()
+    mask = np.triu(np.ones_like(corr, dtype=bool), k=1)
+    sns.heatmap(corr, mask=mask, annot=True, fmt='.2f',
+                cmap='RdBu_r', center=0, vmin=-1, vmax=1,
+                square=True, linewidths=0.5,
+                cbar_kws={'shrink': 0.8, 'label': '相关系数'})
+    plt.title('Glass 数据集 9 个特征相关性矩阵', fontsize=14)
+    plt.xticks(rotation=45, ha='right')
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
+
+
+"""
+使用 PCA 降维散点图 + 特征贡献分析。
+
+Parameters
+----------
+X : DataFrame
+    全部特征（已标准化）。
+y_encoded : array-like
+    全部标签。
+le : LabelEncoder
+    标签编码器（用于获取类别名称）。
+**kwargs : dict
+    传递给 GaussianNB 的参数（用于交叉验证错误统计）。
+"""
+def plot_top_features_scatter(X, y_encoded, le, **kwargs):
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+    # 子图1: PCA 空间散点图
+    for i, name in enumerate(le.classes_):
+        mask = y_encoded == i
+        axes[0].scatter(X_pca[mask, 0], X_pca[mask, 1],
+                        label=name, alpha=0.7, edgecolors='k', s=50)
+    axes[0].set_xlabel(f'主成分 1 ({pca.explained_variance_ratio_[0]:.1%})')
+    axes[0].set_ylabel(f'主成分 2 ({pca.explained_variance_ratio_[1]:.1%})')
+    axes[0].set_title(f'PCA 降维散点图\n(累计解释方差: {pca.explained_variance_ratio_.sum():.1%})')
+    axes[0].legend()
+
+    # 子图2: 各特征对前 2 个主成分的总贡献
+    loadings = pd.DataFrame({
+        'PC1': pca.components_[0],
+        'PC2': pca.components_[1]
+    }, index=X.columns)
+    axes[1].barh(range(len(X.columns)), np.abs(loadings).sum(axis=1))
+    axes[1].set_yticks(range(len(X.columns)))
+    axes[1].set_yticklabels(X.columns)
+    axes[1].set_xlabel('对主成分的总贡献度')
+    axes[1].set_title('各特征对 PCA 前 2 主成分的总贡献')
+
+    plt.suptitle('Glass 数据集 — PCA 降维可视化 + 特征贡献分析', fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
+    # 交叉验证错误统计
+    from sklearn.model_selection import cross_val_predict
+    model = GaussianNB(**kwargs)
+    model.fit(X.values, y_encoded)
+    y_pred = cross_val_predict(model, X.values, y_encoded, cv=5)
+
+    n_errors = sum(y_encoded != y_pred)
+    if n_errors > 0:
+        print(f'\n5 折交叉验证错误样本: {n_errors}/{len(y_encoded)} = {n_errors/len(y_encoded):.1%}')
+    else:
+        print('\n5 折交叉验证全部正确！')
+
+
+"""
+朴素贝叶斯完整流水线：训练 → 评估 → 五种可视化。
+
+Glass 专用流水线，包含：
+- 分类报告 + 混淆矩阵
+- PCA 降维决策边界
+- 特征统计（θ 和 σ²）
+- 特征相关性热力图
+- PCA 散点 + 特征贡献分析
+
+Parameters
+----------
+X_train, X_test : DataFrame
+    训练/测试特征。
+y_train, y_test : array-like
+    训练/测试标签。
+X_full : DataFrame
+    全部特征（用于 PCA 可视化）。
+y_encoded : array-like
+    全部标签。
+le : LabelEncoder
+    标签编码器。
+**kwargs : dict
+    传递给 GaussianNB 的参数。
+
+Returns
+-------
+model : GaussianNB
+    训练好的模型。
+y_pred : ndarray
+    测试集预测结果。
+"""
+def run_nb_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le, **kwargs):
+    # 1. 训练 + 评估
+    model, y_pred = train_and_evaluate(
+        X_train, X_test, y_train, y_test, le.classes_, **kwargs
+    )
+    accuracy = model.score(X_test, y_test)
+
+    # 2. 混淆矩阵
+    plot_confusion_matrix(y_test, y_pred, le.classes_, accuracy)
+
+    # 3. 特征统计（朴素贝叶斯无重要性，打印 θ 和 σ²）
+    plot_feature_importance(model, X_train.columns.tolist())
+
+    # 4. PCA 降维决策边界
+    plot_pca_decision_boundary(X_full, y_encoded, le.classes_, **kwargs)
+
+    # 5. 特征相关性热力图
+    plot_correlation_heatmap(X_full, y_encoded, le.classes_)
+
+    # 6. PCA 散点 + 特征贡献分析
+    plot_top_features_scatter(X_full, y_encoded, le, **kwargs)
+
+    return model, y_pred

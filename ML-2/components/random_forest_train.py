@@ -42,6 +42,9 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     return model, y_pred
 
 
+"""
+绘制混淆矩阵热力图。
+"""
 def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
@@ -51,6 +54,9 @@ def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     plt.show()
 
 
+"""
+绘制随机森林特征重要性条形图。
+"""
 def plot_feature_importance(model, feature_names):
     importances = model.feature_importances_
     indices = np.argsort(importances)[::-1]
@@ -70,6 +76,9 @@ def plot_feature_importance(model, feature_names):
     plt.show()
 
 
+"""
+PCA 降维到 2D，绘制随机森林决策边界。
+"""
 def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -93,6 +102,9 @@ def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     plt.show()
 
 
+"""
+绘制特征相关性热力图。
+"""
 def plot_correlation_heatmap(X, y_encoded, class_names):
     df_corr = X.copy()
     df_corr['类别'] = y_encoded
@@ -111,6 +123,9 @@ def plot_correlation_heatmap(X, y_encoded, class_names):
     plt.tight_layout(); plt.show()
 
 
+"""
+PCA 散点图 + 特征贡献分析。
+"""
 def plot_top_features_scatter(X, y_encoded, le, **kwargs):
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -141,6 +156,9 @@ def plot_top_features_scatter(X, y_encoded, le, **kwargs):
         print('\n5 折交叉验证全部正确！')
 
 
+"""
+随机森林完整流水线：训练 → 评估 → 五种可视化。
+"""
 def run_rf_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le, **kwargs):
     if 'n_estimators' not in kwargs:
         kwargs['n_estimators'] = 100

@@ -7,11 +7,28 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score, adjusted_rand_score, adjusted_mutual_info_score
 
 
+"""
+K-means 聚类完整流水线：训练 → 评估 → 可视化。
+
+Parameters
+----------
+X : DataFrame
+    全部特征（已标准化，去标签）
+y_true : array-like
+    原始标签（用于算 ARI/AMI 外部指标，可选）
+n_clusters : int
+    聚类数，默认 3
+random_state : int
+    随机种子，默认 42
+
+Returns
+-------
+model : KMeans
+    训练好的模型
+y_pred : ndarray
+    聚类标签
+"""
 def run_kmeans_pipeline(X, y_true, n_clusters=3, random_state=42):
-    """
-    X: 全部特征（去标签）
-    y_true: 原始标签（用于算 ARI/AMI 外部指标，可选）
-    """
     # 1. K-means 训练
     model = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
     y_pred = model.fit_predict(X)

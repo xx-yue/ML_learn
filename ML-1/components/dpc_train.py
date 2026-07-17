@@ -7,12 +7,30 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 
 
+"""
+密度峰值聚类核心算法：计算 rho, delta, gamma 和最近更高密度点。
+
+Parameters
+----------
+X : ndarray
+    特征矩阵 (n_samples, n_features)
+dc_percent : float
+    截断距离百分比，默认 2%
+
+Returns
+-------
+order : ndarray
+    按 rho 降序排列的索引
+rho : ndarray
+    局部密度
+delta : ndarray
+    到更高密度点的最小距离
+gamma : ndarray
+    rho * delta
+nearest_higher : ndarray
+    每个点的最近更高密度点索引
+"""
 def density_peaks(X, dc_percent=2.0):
-    """
-    X: (n_samples, n_features)
-    dc_percent: 截断距离百分比，默认 2%
-    返回：order, rho, delta, gamma, nearest_higher
-    """
     n = X.shape[0]
     nbrs = NearestNeighbors(n_neighbors=n).fit(X)
     distances, _ = nbrs.kneighbors(X)
@@ -41,11 +59,13 @@ def density_peaks(X, dc_percent=2.0):
     return order, rho, delta, gamma, nearest_higher
 
 
+"""
+根据中心点和最近更高密度点分配簇标签。
+
+把非中心样本分配到"最近更高密度点所属簇"。
+按密度降序遍历：每个未分配样本继承其 nearest_higher 的标签。
+"""
 def assign_clusters(X, centers_idx, nearest_higher, rho):
-    """
-    把非中心样本分配到"最近更高密度点所属簇"。
-    按密度降序遍历：每个未分配样本继承其 nearest_higher 的标签。
-    """
     n = X.shape[0]
     labels = -np.ones(n, dtype=int)
     for i, c in enumerate(centers_idx):
@@ -58,10 +78,28 @@ def assign_clusters(X, centers_idx, nearest_higher, rho):
     return labels
 
 
+"""
+DPC 完整流水线：训练 → 决策图 → 聚类 → 评估 → PCA 可视化。
+
+Parameters
+----------
+X : DataFrame
+    全部特征（已标准化，去标签）
+y_true : array-like
+    真实标签（用于计算 ARI 外部指标）
+n_clusters : int
+    聚类数，默认 3
+dc_percent : float
+    截断距离百分比，默认 1.0
+
+Returns
+-------
+centers : ndarray
+    聚类中心索引
+y_pred : ndarray
+    聚类标签
+"""
 def run_dpc_pipeline(X, y_true, n_clusters=3, dc_percent=1.0, random_state=42):
-    """
-    DPC 流水线：训练 → 决策图 → 聚类 → 评估 → PCA 可视化
-    """
     order, rho, delta, gamma, nearest_higher = density_peaks(X, dc_percent)
 
     # 选前 n_clusters 个 gamma 最大的作为中心

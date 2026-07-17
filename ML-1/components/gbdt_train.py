@@ -7,6 +7,27 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 from sklearn.decomposition import PCA
 
 
+"""
+训练 GBDT 并打印分类报告。
+
+Parameters
+----------
+X_train, X_test : DataFrame
+    训练/测试特征
+y_train, y_test : array-like
+    训练/测试标签（已编码为整数）
+class_names : array-like
+    原始类别名称，用于报告显示
+**kwargs : dict
+    传递给 GradientBoostingClassifier 的参数
+
+Returns
+-------
+model : GradientBoostingClassifier
+    训练好的模型
+y_pred : ndarray
+    测试集预测结果
+"""
 def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     model = GradientBoostingClassifier(**kwargs)
     model.fit(X_train, y_train)
@@ -19,6 +40,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     return model, y_pred
 
 
+"""绘制混淆矩阵热力图，展示真实类别 vs 预测类别的分布。"""
 def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
@@ -28,6 +50,7 @@ def plot_confusion_matrix(y_test, y_pred, class_names, accuracy):
     plt.show()
 
 
+"""绘制 GBDT 特征重要性条形图。"""
 def plot_feature_importance(model, feature_names):
     importances = model.feature_importances_
     indices = np.argsort(importances)[::-1]
@@ -45,6 +68,7 @@ def plot_feature_importance(model, feature_names):
     plt.show()
 
 
+"""PCA 降维到 2D，在降维后空间训练 GBDT 并绘制决策边界。"""
 def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -71,6 +95,12 @@ def plot_pca_decision_boundary(X, y, class_names, **kwargs):
     plt.show()
 
 
+"""
+GBDT 完整流水线：训练 → 评估 → 混淆矩阵 → 特征重要性 → PCA 决策边界。
+
+默认 n_estimators=100, learning_rate=0.1, random_state=42。
+供 main.py 调用的统一入口。
+"""
 def run_gbdt_pipeline(X_train, X_test, y_train, y_test, X_full, y_encoded, le, **kwargs):
     if 'n_estimators' not in kwargs:
         kwargs['n_estimators'] = 100

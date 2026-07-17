@@ -1,6 +1,23 @@
 # 15个数据集
 
 ## [ML-1](./ML-1/readme.md) — 鸢尾花数据集（KNN + 决策树）
+## [ML-2](./ML-2/readme.md) — Wine 葡萄酒成分识别（13维特征 + 标准化）
+## [ML-3](./ML-3/readme.md) — 乳腺癌诊断识别（30维特征 + 二分类 + AUC）
+## [ML-4](./ML-4/readme.md) — Glass 玻璃识别（9维特征 + 6分类）
+## [ML-5](./ML-5/readme.md) — Wine Quality 葡萄酒质量（11维特征 + 6分类）
+## [ML-6](./ML-6/readme.md) — Car Evaluation 汽车评估（6分类特征 + 4分类）
+## [ML-7](./ML-7/readme.md) — Abalone 鲍鱼年龄（8维特征 + 3分类 + 分箱）
+## [ML-8](./ML-8/readme.md) — Online Shoppers 在线购物意图（17维特征 + 二分类 + AUC）
+## [ML-9](./ML-9/readme.md) — Bank Marketing 银行营销（20维特征 + 二分类 + AUC）
+## [ML-10](./ML-10/readme.md) — Concrete 混凝土强度（8维特征 + 3分类 + 分箱）
+## [ML-11](./ML-11/readme.md) — Auto MPG 汽车油耗（7维特征 + 3分类 + 分箱 + 缺失值）
+## [ML-12](./ML-12/readme.md) — Wholesale 批发客户（7维特征 + 二分类 + AUC）
+## [ML-13](./ML-13/readme.md) — Seeds 种子分类（7维特征 + 3分类）
+## [ML-14](./ML-14/readme.md) — Banknote 钞票认证（4维特征 + 二分类 + AUC）
+## [ML-15](./ML-15/readme.md) — Mammographic 乳腺肿块（5维特征 + 二分类 + AUC + 缺失值）
+## [ML-16](./ML-16/readme.md) — Adult 成人收入（14维特征 + 二分类 + AUC + 8分类编码）
+## [ML-17](./ML-17/readme.md) — Bike Sharing 自行车共享（11维特征 + 3分类 + 分箱）
+## [ML-18](./ML-18/readme.md) — Online Retail 在线零售（5维RFM特征 + 3分类 + 客户聚合）
 
 # 机器学习概述
 

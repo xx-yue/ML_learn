@@ -62,15 +62,15 @@ print(f'类别分布: {dict(zip(class_names, pd.Series(y_encoded).value_counts()
 #                  kernel='rbf', gamma='scale', C=1.0)
 
 # ==================== 4. 朴素贝叶斯 ====================
-# from components.naive_bayes_train import run_nb_pipeline
-# run_nb_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le)
+from components.naive_bayes_train import run_nb_pipeline
+run_nb_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le)
 
 # ==================== 5. 逻辑回归 ====================
-# from components.logistic_regression_train import run_lr_pipeline
+from components.logistic_regression_train import run_lr_pipeline
 # run_lr_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, max_iter=500)
 
 # ==================== 6. 随机森林 ====================
-# from components.random_forest_train import run_rf_pipeline
+from components.random_forest_train import run_rf_pipeline
 # run_rf_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=100)
 
 # ==================== 7. XGBoost ====================
@@ -86,8 +86,8 @@ print(f'类别分布: {dict(zip(class_names, pd.Series(y_encoded).value_counts()
 # run_gbdt_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=100)
 
 # ==================== 10. AdaBoost ====================
-# from components.adaboost_train import run_adaboost_pipeline
-# run_adaboost_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=50)
+from components.adaboost_train import run_adaboost_pipeline
+run_adaboost_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=50)
 
 # ==================== 11. K-means 聚类（可选，无监督对比） ====================
 # from components.kmeans_train import run_kmeans_pipeline
