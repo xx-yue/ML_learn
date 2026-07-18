@@ -45,7 +45,7 @@ print(f'类别分布: {dict(zip(class_names, pd.Series(y_encoded).value_counts()
 
 # ==================== 1. KNN 训练与可视化 ====================
 from components.knn_train import run_knn_pipeline
-# run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
+run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
 
 # ==================== 2. 决策树 ====================
 from components.decision_tree import run_dt_pipeline
@@ -53,7 +53,7 @@ from components.decision_tree import run_dt_pipeline
 #                 criterion='gini', max_depth=5)
 
 # ==================== 3. SVM ====================
-# from components.svm_train import run_svm_pipeline
+from components.svm_train import run_svm_pipeline
 # run_svm_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le,
 #                  kernel='rbf', gamma='scale', C=1.0)
 

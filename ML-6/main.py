@@ -51,7 +51,7 @@ print(f'类别分布: {dict(zip(class_names, pd.Series(y_encoded).value_counts()
 
 # ==================== 1. KNN 训练与可视化 ====================
 from components.knn_train import run_knn_pipeline
-run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
+# run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
 
 # ==================== 2. 决策树 ====================
 # from components.decision_tree import run_dt_pipeline
@@ -64,7 +64,7 @@ run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_ne
 #                  kernel='rbf', gamma='scale', C=1.0)
 
 # ==================== 4. 朴素贝叶斯 ====================
-# from components.naive_bayes_train import run_nb_pipeline
+from components.naive_bayes_train import run_nb_pipeline
 # run_nb_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le)
 
 # ==================== 5. 逻辑回归 ====================
@@ -88,13 +88,13 @@ run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_ne
 # run_gbdt_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=100)
 
 # ==================== 10. AdaBoost ====================
-# from components.adaboost_train import run_adaboost_pipeline
+from components.adaboost_train import run_adaboost_pipeline
 # run_adaboost_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=50)
 
 # ==================== 11. K-means ====================
-# from components.kmeans_train import run_kmeans_pipeline
+from components.kmeans_train import run_kmeans_pipeline
 # run_kmeans_pipeline(X.values, y_encoded, n_clusters=4)
 
 # ==================== 12. 密度峰值聚类 ====================
-# from components.dpc_train import run_dpc_pipeline
+from components.dpc_train import run_dpc_pipeline
 # centers, y_pred_dpc = run_dpc_pipeline(X.values, y_encoded, n_clusters=4, dc_percent=0.1)

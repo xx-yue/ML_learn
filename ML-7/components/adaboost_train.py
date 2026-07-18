@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, f1_score, roc_auc_score, accuracy_score
 from sklearn.decomposition import PCA
 
 
@@ -21,7 +21,28 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, class_names, **kwargs):
     print(f'\n{"="*60}')
     print(f'  AdaBoost 分类报告 (n_estimators={kwargs.get("n_estimators",50)})')
     print(f'{"="*60}')
-    print(classification_report(y_test, y_pred, target_names=class_names))
+    print(classification_report(y_test, y_pred, target_names=class_names, zero_division=0))
+    # 综合评估指标：准确率、F1值、AUC
+    acc = accuracy_score(y_test, y_pred)
+    f1_macro = f1_score(y_test, y_pred, average='macro', zero_division=0)
+    f1_weighted = f1_score(y_test, y_pred, average='weighted', zero_division=0)
+    print(f'\n  准确率 (Accuracy):    {acc:.4f}')
+    print(f'  F1值 (Macro):         {f1_macro:.4f}')
+    print(f'  F1值 (Weighted):      {f1_weighted:.4f}')
+    try:
+        if hasattr(model, 'predict_proba'):
+            y_proba = model.predict_proba(X_test)
+            auc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='macro')
+            print(f'  AUC (OvR Macro):      {auc:.4f}')
+        elif hasattr(model, 'decision_function'):
+            y_score = model.decision_function(X_test)
+            auc = roc_auc_score(y_test, y_score, multi_class='ovr', average='macro')
+            print(f'  AUC (OvR Macro):      {auc:.4f}')
+        else:
+            print(f'  AUC:                  不支持（模型无 predict_proba / decision_function）')
+    except Exception as e:
+        print(f'  AUC:                  无法计算 ({e})')
+
     return model, y_pred
 
 

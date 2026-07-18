@@ -55,7 +55,7 @@ print(f'类别分布: {dict(zip(class_names, pd.Series(y_encoded).value_counts()
 
 # ==================== 1. KNN 训练与可视化 ====================
 from components.knn_train import run_knn_pipeline
-run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
+# run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
 
 # ==================== 2. 决策树 ====================
 # from components.decision_tree import run_dt_pipeline
@@ -80,7 +80,7 @@ run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_ne
 # run_rf_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_estimators=100)
 
 # ==================== 7. XGBoost ====================
-# from components.xgboost_train import run_xgb_pipeline
+from components.xgboost_train import run_xgb_pipeline
 # run_xgb_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le)
 
 # ==================== 8. LightGBM ====================
