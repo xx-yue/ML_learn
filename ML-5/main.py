@@ -1,8 +1,15 @@
-"""葡萄酒质量分类 — 主入口（Wine Quality 数据集，11 种理化指标，6 个质量等级）"""
+"""葡萄酒质量分类 — 主入口（Wine Quality 数据集，11 种理化指标）
+
+用法:
+    python main.py                 # 默认使用红葡萄酒数据
+    python main.py --type red      # 红葡萄酒 (1599 条, quality 3-8, 6 类)
+    python main.py --type white    # 白葡萄酒 (4898 条, quality 3-9, 7 类)
+"""
 import os
 os.environ['OMP_NUM_THREADS'] = '1'  # 修复 Windows MKL KMeans 内存泄漏（必须在 import sklearn 之前）
 import warnings
 warnings.filterwarnings('ignore', message='X does not have valid feature names')
+import argparse
 import pandas as pd
 import matplotlib
 matplotlib.use('TkAgg')             # 修复 PyCharm 后端 bug
@@ -11,9 +18,15 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 
+# ==================== 命令行参数 ====================
+parser = argparse.ArgumentParser(description='葡萄酒质量分类（支持红/白葡萄酒切换）')
+parser.add_argument('--type', choices=['red', 'white'], default='red',
+                    help='葡萄酒类型: red(红, 6类) / white(白, 7类), 默认 red')
+args = parser.parse_args()
+
 # ==================== 数据加载 ====================
 script_dir = os.path.dirname(__file__)
-file_path = os.path.join(script_dir, 'data', 'winequality-red.csv')
+file_path = os.path.join(script_dir, 'data', f'winequality-{args.type}.csv')
 df = pd.read_csv(file_path, sep=';')  # 分号分隔，带表头
 
 # ==================== 数据预处理 ====================
@@ -21,13 +34,13 @@ df = pd.read_csv(file_path, sep=';')  # 分号分隔，带表头
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei']
 plt.rcParams['axes.unicode_minus'] = False
 
-X = df.drop('quality', axis=1)       # 特征矩阵（1599 行 × 11 列）
-y = df['quality']                     # 目标向量（3-8）
+X = df.drop('quality', axis=1)       # 特征矩阵（11 列理化指标）
+y = df['quality']                     # 目标向量（red: 3-8 / white: 3-9）
 
-# 标签编码：3→0, 4→1, 5→2, 6→3, 7→4, 8→5
+# 标签编码：red 3→0...8→5 (6类) / white 3→0...9→6 (7类)，LabelEncoder 自动适配
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
-class_names = [str(c) for c in le.classes_]  # ['3', '4', '5', '6', '7', '8']
+class_names = [str(c) for c in le.classes_]  # 自动生成交类名列表
 
 # 标准化 — Wine Quality 特征量纲差异大，KNN 等距离模型必须标准化
 scaler = StandardScaler()
@@ -45,7 +58,7 @@ print(f'类别分布: {dict(zip(class_names, pd.Series(y_encoded).value_counts()
 
 # ==================== 1. KNN 训练与可视化 ====================
 from components.knn_train import run_knn_pipeline
-run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
+# run_knn_pipeline(X_train, X_test, y_train, y_test, X_scaled, y_encoded, le, n_neighbors=5)
 
 # ==================== 2. 决策树 ====================
 from components.decision_tree import run_dt_pipeline
@@ -88,11 +101,11 @@ from components.svm_train import run_svm_pipeline
 
 # ==================== 11. K-means ====================
 # from components.kmeans_train import run_kmeans_pipeline
-# # Wine Quality 去标签跑：X 是全部特征，y_encoded 是原标签（用于算 ARI）
-# run_kmeans_pipeline(X.values, y_encoded, n_clusters=6)
+# # n_clusters 自动适配: red=6, white=7
+# run_kmeans_pipeline(X.values, y_encoded, n_clusters=len(le.classes_))
 
 
 # ==================== 12. 密度峰值聚类 ====================
 # from components.dpc_train import run_dpc_pipeline
-# # DPC 在 Wine Quality 上：dc_percent 调 1.5-3.0 看效果，n_clusters=6
-# centers, y_pred_dpc = run_dpc_pipeline(X.values, y_encoded, n_clusters=6, dc_percent=0.1)
+# # DPC: dc_percent 调 1.5-3.0 看效果, n_clusters 自动适配 red=6 / white=7
+# centers, y_pred_dpc = run_dpc_pipeline(X.values, y_encoded, n_clusters=len(le.classes_), dc_percent=0.1)

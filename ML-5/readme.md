@@ -119,7 +119,9 @@ run_dpc_pipeline(X.values, y_encoded, n_clusters=6, dc_percent=0.1)
 ```
 
 ```bash
-python main.py
+python main.py --type red
+
+python main.py --type white
 ```
 
 ## 可视化

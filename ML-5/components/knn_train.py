@@ -153,38 +153,38 @@ def plot_correlation_heatmap(X, y_encoded, class_names):
 展示样本在最有区分力的二维空间中的分布。
 """
 def plot_top_features_scatter(X, y_encoded, le, n_neighbors=5):
-    # 使用 PCA 找出区分力最强的 2 个主成分
-    pca = PCA(n_components=2)
+    # 使用 PCA 找出区分力最强的 3 个主成分
+    pca = PCA(n_components=3)
     X_pca = pca.fit_transform(X)
 
-    # 同时找出与第 1、2 主成分最相关的原始特征
-    comp1 = pd.Series(pca.components_[0], index=X.columns)
-    comp2 = pd.Series(pca.components_[1], index=X.columns)
+    fig = plt.figure(figsize=(18, 6))
 
-    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-
-    # 子图1: PCA 空间散点图
+    # 子图1: PCA 3D 空间散点图（区分力最强的 3 个主成分）
+    ax1 = fig.add_subplot(121, projection='3d')
     for i, name in enumerate(le.classes_):
         mask = y_encoded == i
-        axes[0].scatter(X_pca[mask, 0], X_pca[mask, 1],
-                        label=name, alpha=0.7, edgecolors='k', s=50)
-    axes[0].set_xlabel(f'主成分 1 ({pca.explained_variance_ratio_[0]:.1%})')
-    axes[0].set_ylabel(f'主成分 2 ({pca.explained_variance_ratio_[1]:.1%})')
-    axes[0].set_title(f'PCA 降维散点图\n(累计解释方差: {pca.explained_variance_ratio_.sum():.1%})')
-    axes[0].legend()
+        ax1.scatter(X_pca[mask, 0], X_pca[mask, 1], X_pca[mask, 2],
+                    label=name, alpha=0.7, edgecolors='k', s=50)
+    ax1.set_xlabel(f'主成分 1 ({pca.explained_variance_ratio_[0]:.1%})')
+    ax1.set_ylabel(f'主成分 2 ({pca.explained_variance_ratio_[1]:.1%})')
+    ax1.set_zlabel(f'主成分 3 ({pca.explained_variance_ratio_[2]:.1%})')
+    ax1.set_title(f'PCA 3D 降维散点图\n(累计解释方差: {pca.explained_variance_ratio_.sum():.1%})')
+    ax1.legend()
 
-    # 子图2: 主成分载荷（各原始特征对前 2 个主成分的贡献）
+    # 子图2: 各特征对前 3 个主成分的总贡献
     loadings = pd.DataFrame({
         'PC1': pca.components_[0],
-        'PC2': pca.components_[1]
+        'PC2': pca.components_[1],
+        'PC3': pca.components_[2]
     }, index=X.columns)
-    axes[1].barh(range(len(X.columns)), np.abs(loadings).sum(axis=1))
-    axes[1].set_yticks(range(len(X.columns)))
-    axes[1].set_yticklabels(X.columns)
-    axes[1].set_xlabel('对主成分的总贡献度')
-    axes[1].set_title('各特征对 PCA 前 2 主成分的总贡献')
+    ax2 = fig.add_subplot(122)
+    ax2.barh(range(len(X.columns)), np.abs(loadings).sum(axis=1))
+    ax2.set_yticks(range(len(X.columns)))
+    ax2.set_yticklabels(X.columns)
+    ax2.set_xlabel('对主成分的总贡献度')
+    ax2.set_title('各特征对 PCA 前 3 主成分的总贡献')
 
-    plt.suptitle('Wine Quality 数据集 — PCA 降维可视化 + 特征贡献分析', fontsize=14)
+    plt.suptitle('Wine Quality 数据集 — PCA 3D 降维可视化 + 特征贡献分析', fontsize=14)
     plt.tight_layout()
     plt.show()
 
